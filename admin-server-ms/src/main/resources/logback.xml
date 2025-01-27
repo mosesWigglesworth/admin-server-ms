@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<springProperty name="module.name" source="logger.name" />
+	<springProperty name="log.dir" source="logger.path" />
+	<property name="VerboseLowConversionPattern"
+		value="%n%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+	<property name="VerboseMediumConversionPattern"
+		value="%n%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n" />
+	<property name="VerboseHighConversionPattern"
+		value="%n%d{HH:mm:ss.SSS} [%thread] %highlight(%-5level) %logger{36} (%file:%line) - %msg%n" />
+	<property name="LogFileConversionPattern"
+		value="${VerboseMediumConversionPattern}" />
+	<property name="ConsoleConversionPattern"
+		value="${VerboseHighConversionPattern}" />
+
+	<!-- Global Threshold -->
+	<property name="log4j.threshold" value="TRACE" />
+	<property name="log.DefaultFileLogThreshold" value="${log4j.threshold}" />
+
+
+	<!-- Standard Rollover Frequencies (for DailyRollingFileAppender) -->
+	<property name="log.file.MonthlyRolloverFrequency" value="'-'yyyy-MM" />
+	<property name="log.file.WeeklyRolloverFrequency" value="'-'yyyy-ww" />
+	<property name="log.file.DailyRolloverFrequency" value="yyyy-MM-dd" />
+	<property name="log.file.HourlyRolloverFrequency" value="'-'yyyy-MM-dd-HH" />
+	<property name="log.file.MinlyRolloverFrequency" value="'-'yyyy-MM-dd-HH-mm" />
+	<property name="log.file.DefaultRolloverFrequency"
+		value="${log.file.DailyRolloverFrequency}" />
+
+
+	<appender name="file"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--for further documentation-->
+		<File>${log.dir}</File>
+		<encoder>
+			<pattern>${LogFileConversionPattern}</pattern>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>${log.DefaultFileLogThreshold}</level>
+		</filter>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>
+				${module.name}.%d{${log.file.DailyRolloverFrequency}}_%i.zip</fileNamePattern>
+			<timeBasedFileNamingAndTriggeringPolicy
+				class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+				<maxFileSize>50MB</maxFileSize>
+			</timeBasedFileNamingAndTriggeringPolicy>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="console"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${ConsoleConversionPattern}</pattern>
+			<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+				<level>${log.DefaultFileLogThreshold}</level>
+			</filter>
+		</encoder>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="console" />
+		<appender-ref ref="file" />
+	</root>
+</configuration>
